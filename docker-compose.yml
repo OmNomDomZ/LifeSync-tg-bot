@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    volumes:
+      - ./sql/00_init.sql:/docker-entrypoint-initdb.d/00_init.sql
+      - ./sql/01_create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  bot:
+    build: .
+    env_file:
+      - data.env
+    environment:
+      - DB_HOST=db
+      - DB_NAME=lifebot_db
+      - DB_USER=lifebot_user
+      - DB_PASSWORD=lifebot_pass
+      - DB_PORT=5432
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db_data:
