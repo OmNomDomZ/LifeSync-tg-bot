@@ -1,3 +1,7 @@
 python-telegram-bot==20.3
 psycopg2-binary==2.9.10
 python-dotenv==1.0.0
+
+google-api-python-client~=2.92.0
+protobuf~=5.29.1
+google-auth-oauthlib~=1.0.0

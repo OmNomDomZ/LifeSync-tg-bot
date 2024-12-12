@@ -100,12 +100,13 @@ def make_time_keyboard(hour, minute):
     buttons = [
         [
             InlineKeyboardButton("Час--", callback_data="HOUR_DOWN"),
-            InlineKeyboardButton(f"{hour:02d}:{minute:02d}", callback_data="TIME_NOP"),
             InlineKeyboardButton("Час++", callback_data="HOUR_UP")
         ],
         [
-            InlineKeyboardButton("Мин--", callback_data="MIN_DOWN"),
             InlineKeyboardButton(f"{hour:02d}:{minute:02d}", callback_data="TIME_NOP"),
+        ],
+        [
+            InlineKeyboardButton("Мин--", callback_data="MIN_DOWN"),
             InlineKeyboardButton("Мин++", callback_data="MIN_UP")
         ],
         [InlineKeyboardButton("Готово", callback_data="TIME_DONE")]
@@ -140,7 +141,7 @@ async def time_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "TIME_DONE":
         # Время выбрано
         context.user_data["new_event_time"] = datetime.time(hour, minute)
-        await query.edit_message_text("Введите описание события (можно оставить пустым) или /cancel для отмены:")
+        await query.edit_message_text("Введите описание события ('-' чтобы оставить пустым) или /cancel для отмены:")
         return DESCRIPTION
 
     context.user_data["temp_hour"] = hour
@@ -149,7 +150,11 @@ async def time_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return SELECT_TIME
 
 async def receive_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    description = update.message.text.strip() if update.message.text else None
+
+    if update.message.text and not(update.message.text == '-'):
+        description = update.message.text.strip()
+    else:
+        description = None
 
     user_id = update.effective_user.id
     title = context.user_data.get("new_event_title")
